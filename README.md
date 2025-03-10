@@ -11,3 +11,9 @@ BlazorMicrofrontends\
  ── Microfrontend.one/ # First Microfrontend module\
  ── Microfrontend.two/ # Second Microfrontend module\
  ── BlazorApp.Shared/ # Shared components and services\
+
+Each micromodule is a separate project that must:
+
+Implement the IMfModule interface
+Register routes and components
+Be loaded into Blazor.Shell
