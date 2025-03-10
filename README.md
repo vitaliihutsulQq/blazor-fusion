@@ -49,3 +49,6 @@ In the same module, create a component **ModuleOne.razor**:
 
 ```
 # 3. Add your micromodule in Blazor.Shell dependencies 
+
+# 4. Displaying modules in MainLayout
+All modules are loaded via **DynamicComponent** in **MainLayout.razor**.
