@@ -6,8 +6,8 @@ It allows you to dynamically load and manage independent modules, improving scal
  * Isolated development – ​​each microfrontend can be developed and tested independently.
  * Flexibility – easily integrate new modules without changing the core.
 
-BlazorMicrofrontends/
-│── BlazorApp.Shell/ # Main Shell (main application)
-│── Microfrontend.one/ # First Microfrontend module
-│── Microfrontend.two/ # Second Microfrontend module
-│── BlazorApp.Shared/ # Shared components and services
+BlazorMicrofrontends\
+ ── BlazorApp.Shell/ # Main Shell (main application)\
+ ── Microfrontend.one/ # First Microfrontend module\
+ ── Microfrontend.two/ # Second Microfrontend module\
+ ── BlazorApp.Shared/ # Shared components and services\
