@@ -1,0 +1,40 @@
+﻿@using BlazorApp.Shared
+@using BlazorApp.Shared.Services
+@inject IMfAppService AppService
+@inject NavigationManager Navigation
+
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+            <p>Available routes: @string.Join(", ", AppService.GetRoutes().Keys)</p>
+        </LayoutView>
+    </NotFound>
+
+</Router>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var routes = AppService.GetRoutes();
+
+        if (routes.Count > 0)
+        {
+            Console.WriteLine($"[Shell] Loaded {routes.Count} routes from modules.");
+            Console.WriteLine($"[Shell] Available routes: {string.Join(", ", routes.Keys)}");
+            foreach (var route in routes)
+            {
+                Console.WriteLine($"[Shell] Route registered: {route.Key} -> {route.Value.Name}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("[Shell] No routes registered.");
+        }
+    }
+}

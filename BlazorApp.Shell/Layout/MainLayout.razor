@@ -1,0 +1,56 @@
+﻿@using BlazorApp.Shared
+@using BlazorApp.Shared.Services
+@inherits LayoutComponentBase
+@inject IMfAppService MfAppService
+@inject NavigationManager Navigation
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @{
+                var currentRoute = Navigation.Uri.Replace(Navigation.BaseUri, "").Trim('/');
+
+                if (MfAppService.GetRoutes().TryGetValue("/" + currentRoute, out var componentType))
+                {
+                    Console.WriteLine($"[Layout] Found componentType: {componentType}");
+
+                    if (componentType == null)
+                    {
+                        Console.WriteLine($"[Layout] ERROR: componentType is NULL for route {currentRoute}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[Layout] Rendering DynamicComponent for: {currentRoute}");
+                        <DynamicComponent Type="componentType" />
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"[Layout] Route not found in MfAppService: {currentRoute}");
+                    @Body
+                }
+            }
+        </article>
+    </main>
+</div>
+@code {
+    private bool routesLoaded = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(500); 
+        routesLoaded = true;
+
+        Console.WriteLine("[Layout] Routes loaded: " + string.Join(", ", MfAppService.GetRoutes().Keys));
+
+        StateHasChanged();
+    }
+}

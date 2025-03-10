@@ -1,0 +1,24 @@
+﻿@page "/"
+@inject NavigationManager Navigation
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.<br />
+
+<button class="btn btn-primary" @onclick=OpenModuleOne>OpenModule.One</button>
+<button class="btn btn-primary" @onclick=OpenModuleTwo>OpenModule.Two</button>
+
+@code {
+ 
+    void OpenModuleOne()
+    {
+        Navigation.NavigateTo("/module-one");
+    }
+
+    void OpenModuleTwo()
+    {
+        Navigation.NavigateTo("/module-two");
+    }
+}
