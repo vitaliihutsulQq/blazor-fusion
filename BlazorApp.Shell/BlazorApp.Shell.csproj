@@ -17,4 +17,9 @@
     <ProjectReference Include="..\Microfrontend.two\Microfrontend.two.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<BlazorWebAssemblyLazyLoad Include="Microfrontend.one.wasm" />
+		<BlazorWebAssemblyLazyLoad Include="Microfrontend.two.wasm" />
+	</ItemGroup>
+	
 </Project>

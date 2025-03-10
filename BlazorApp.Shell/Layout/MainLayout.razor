@@ -15,42 +15,7 @@
         </div>
 
         <article class="content px-4">
-            @{
-                var currentRoute = Navigation.Uri.Replace(Navigation.BaseUri, "").Trim('/');
-
-                if (MfAppService.GetRoutes().TryGetValue("/" + currentRoute, out var componentType))
-                {
-                    Console.WriteLine($"[Layout] Found componentType: {componentType}");
-
-                    if (componentType == null)
-                    {
-                        Console.WriteLine($"[Layout] ERROR: componentType is NULL for route {currentRoute}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"[Layout] Rendering DynamicComponent for: {currentRoute}");
-                        <DynamicComponent Type="componentType" />
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"[Layout] Route not found in MfAppService: {currentRoute}");
-                    @Body
-                }
-            }
+            @Body
         </article>
     </main>
 </div>
-@code {
-    private bool routesLoaded = false;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Task.Delay(500); 
-        routesLoaded = true;
-
-        Console.WriteLine("[Layout] Routes loaded: " + string.Join(", ", MfAppService.GetRoutes().Keys));
-
-        StateHasChanged();
-    }
-}

@@ -1,40 +1,56 @@
 ﻿@using BlazorApp.Shared
 @using BlazorApp.Shared.Services
+@using System.Reflection
+@using Microsoft.AspNetCore.Components.WebAssembly.Services
 @inject IMfAppService AppService
 @inject NavigationManager Navigation
+@inject LazyAssemblyLoader AssemblyLoader
+@inject IModuleRegistry ModuleRegistry
+@inject ILogger<App> Logger
 
-<Router AppAssembly="@typeof(App).Assembly">
+<Router AppAssembly="@typeof(Program).Assembly" OnNavigateAsync="OnNavigateAsync" AdditionalAssemblies="lazyLoadedAssemblies">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        <RouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)" />
     </Found>
     <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-            <p>Available routes: @string.Join(", ", AppService.GetRoutes().Keys)</p>
-        </LayoutView>
+        <h3>Sorry, there's nothing at this address</h3>
     </NotFound>
-
 </Router>
 
 @code {
+    private List<Assembly> lazyLoadedAssemblies = [];
+    private Dictionary<string, string> moduleMappings;
+
     protected override async Task OnInitializedAsync()
     {
-        var routes = AppService.GetRoutes();
+        moduleMappings = ModuleRegistry.GetModuleMappings();
+    }
 
-        if (routes.Count > 0)
+    private async Task OnNavigateAsync(NavigationContext args)
+    {
+        try
         {
-            Console.WriteLine($"[Shell] Loaded {routes.Count} routes from modules.");
-            Console.WriteLine($"[Shell] Available routes: {string.Join(", ", routes.Keys)}");
-            foreach (var route in routes)
+            Console.WriteLine($"[Router] Navigating to: {args.Path}");
+
+            var currentPath = args.Path.Split('/')[0];
+
+            if (moduleMappings.TryGetValue(currentPath, out var moduleAssembly))
             {
-                Console.WriteLine($"[Shell] Route registered: {route.Key} -> {route.Value.Name}");
+                var moduleDll = $"{moduleAssembly}";
+                var assemblies = await AssemblyLoader.LoadAssembliesAsync(
+                    new[] { moduleDll });
+                lazyLoadedAssemblies.AddRange(assemblies);
+
+            }
+            else
+            {
+                Console.WriteLine($"[Router] No module found for: {args.Path}");
             }
         }
-        else
+        catch (Exception ex)
         {
-            Console.WriteLine("[Shell] No routes registered.");
+            Logger.LogError("Error loading assemblies: {Message}", ex.Message);
         }
+
     }
 }
