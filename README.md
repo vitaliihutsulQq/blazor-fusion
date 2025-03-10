@@ -13,7 +13,7 @@ BlazorMicrofrontends\
  ── BlazorApp.Shared/ # Shared components and services\
 
 # 1. Creating a new micromodule:
-Each micromodule is a separate project that must:
+Each micromodule is a separate Blazor Class Library that must:
 
 Implement the **IMfModule** interface
 Register routes and components
@@ -29,6 +29,7 @@ public class Module : IMfModule
     {
         public void Configure(IServiceCollection services)
         {
+            // Register component in DI
             services.AddScoped<ModuleOne>();
         }
 
@@ -41,14 +42,51 @@ public class Module : IMfModule
         }
     }
 ```
-**Step.2**
 In the same module, create a component **ModuleOne.razor**:
+
 ```
 @page "/module-one"
 <h3>Hello, Microfrontend!</h3>
+```
+**Step.2**
+To avoid specifying each module manually, use **ModuleRegistry**
 
 ```
-# 3. Add your micromodule in Blazor.Shell dependencies 
+public class ModuleRegistry : IModuleRegistry
+{
+    private readonly Dictionary<string, string> moduleMappings = new();
 
-# 4. Displaying modules in MainLayout
-All modules are loaded via **DynamicComponent** in **MainLayout.razor**.
+    public ModuleRegistry()
+    {
+        // Adding new modules
+        moduleMappings.Add("module-one", "Microfrontend.one");
+        moduleMappings.Add("module-two", "Microfrontend.two");
+        moduleMappings.Add("module-three", "Microfrontend.three");
+        moduleMappings.Add("module-four", "Microfrontend.four"); 
+    }
+
+    public Dictionary<string, string> GetModuleMappings()
+    {
+        return moduleMappings;
+    }
+}
+```
+**Step.3**
+Add your modules .dll or wasm (see [.NET 8 blazor .wasm Lazy Loaded Assemblies throws runtime exception and fails to load](https://github.com/dotnet/runtime/issues/95381)) to lazy loading in Blazor.Shell.csproj:
+
+```
+<ItemGroup>
+    <BlazorWebAssemblyLazyLoad Include="Microfrontend.one.wasm" />
+    <BlazorWebAssemblyLazyLoad Include="Microfrontend.two.wasm" />
+    <BlazorWebAssemblyLazyLoad Include="Microfrontend.three.wasm" />
+    <BlazorWebAssemblyLazyLoad Include="Microfrontend.four.wasm" /> 
+</ItemGroup>
+
+<ItemGroup>
+    <ProjectReference Include="..\Microfrontend.one\Microfrontend.one.csproj" />
+    <ProjectReference Include="..\Microfrontend.two\Microfrontend.two.csproj" />
+    <ProjectReference Include="..\Microfrontend.three\Microfrontend.three.csproj" />
+    <ProjectReference Include="..\Microfrontend.four\Microfrontend.four.csproj" /> 
+</ItemGroup>
+```
+
